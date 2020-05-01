@@ -481,38 +481,34 @@ int_v_activity <- map_df(int_vars, act_change_intensity_mods, ipr_model) %>%
 # Compare AIC for intensity model and AIC from absence/presence to determine best model
 
 #Loop over intesnity vars to create table of delta aic and LR_test p values
-activity_change_mods <- function(x, df) {
-  int <- x
-  yn <- str_replace(x, "_intensity", "_yn")
-  
-  df <- df %>% 
-    select(major_activity_change, int = int, yn = yn, age, sex)
-  
-  # Create LR models --------------------------------------------------------
-  mod_int <- glm(major_activity_change ~ int + age + sex, data = df, family = binomial) 
-  mod_yn <- glm(major_activity_change ~ yn + age + sex, data = df, family = binomial) 
-  mod_yn_int <- glm(major_activity_change ~ yn + int, data = df, family = binomial)
-  
-  # mod_yn_int_age <- glm(major_activity_change ~ malaise_yn + malaise_intensity + age, data = ipr_model, family = binomial)
-  # mod_yn_int_age_sex <- glm(major_activity_change ~ malaise_yn + malaise_intensity + age + sex, data = ipr_model, family = binomial)
-  mods_all <- list(mod_int, mod_yn)
-  
-  #Evaulate model using likelihood ratio test
-  an <- anova(mod_yn_int, test = "Chisq") #Demonstrates that addding intensity on top of YN is still significnantly improved 
-  LR_test <- an$`Pr(>Chi)`[3]
-  
-  #Check AIC
-  mod_aic <- map_dbl(mods_all, AIC)
-  delta_aic = mod_aic[2] - mod_aic[1]
-  data.frame(symptom = str_replace(x, "_intensity", ""),
-             aic_int = mod_aic[1],
-             aic_yn = mod_aic[2],
-             delta_aic = delta_aic,
-             LR_test = LR_test,
-             sig = LR_test < 0.05)
+mods_all <- list(mod_int, mod_yn)
+OR_CI <- exp(cbind(coef(mod_int), confint(mod_int))) %>% 
+  as.tibble() %>% 
+  rename(OR = V1, ci2.5 = `2.5 %`, ci97.5 = `97.5 %`) %>%
+  mutate(var = c("intercept", "intensity","age","sex"),
+         or_ci  =  str_c(round(OR, 2), " (", round(ci2.5, 2), "-",  round(ci97.5, 2), ")")) %>% 
+  filter(var == "intensity") %>% pull(or_ci)
+
+print(OR_CI)
+#Evaulate model using likelihood ratio test
+an <- anova(mod_yn_int, test = "Chisq") #Demonstrates that addding intensity on top of YN is still significnantly improved 
+LR_test <- an$`Pr(>Chi)`[3]
+
+#Check AIC
+mod_aic <- map_dbl(mods_all, AIC)
+delta_aic = mod_aic[2] - mod_aic[1]
+data.frame(symptom = str_replace(x, "_intensity", ""),
+           or_ci = OR_CI,
+           aic_int = mod_aic[1],
+           aic_yn = mod_aic[2],
+           delta_aic = delta_aic,
+           LR_test = LR_test,
+           sig = LR_test < 0.05)
 }
 
-binary_v_int <- map_df(int_vars, activity_change_mods, ipr_model) %>% arrange(desc(delta_aic))
+binary_v_int <- map_df(int_vars, activity_change_mods, ipr_model) %>% 
+  arrange(desc(delta_aic)) %>% 
+  mutate_if(is.numeric, ~round(.x, 3))
 
 #Table 2 is a combination of int_v_activity and binary_v_int
 

@@ -89,7 +89,7 @@ index_contact_part <- {ipr_form %>%
 bind_cols(all_part, index_contact_part[-1,])
 
 
-# Figure 1 ----------------------------------------------------------------
+# Appendix. Figure 1 ----------------------------------------------------------------
 
 colors_eid <- c("#FF7F00", "#E41A1C", "#377EB8", "#F781BF", "#4DAF4A", "#FFFF33", "#984EA3", "#A65628", "#999999")
 
@@ -151,7 +151,7 @@ index_contact_df %>%
 
 
 
-# Figure 2 ----------------------------------------------------------------
+# Appendix Figure 2 ----------------------------------------------------------------
 
 #Symptom duration
 yn_vars <- {c("abdominal_yn", "anorexia_yn_imputed", "badtaste_yn_imputed", 
@@ -240,7 +240,7 @@ cowplot::plot_grid(all_duration_plot, indiv_duration_plot, align = 'h', axis = '
 
 
 
-# Figure 3 ----------------------------------------------------------------
+# Main text Figure 1 ----------------------------------------------------------------
 
 #Partial
 heatmap_partial_vars <-  c("malaise_yn_imputed", "fever_yn_imputed", 
@@ -284,7 +284,7 @@ ipr_matrix_imputed %>%
   coord_cartesian(clip = "off")
 
 
-# Figure 4 ----------------------------------------------------------------
+# Main text Figure 2 ----------------------------------------------------------------
 
 #Create data frame for labels
 max_intensity_label <- ipr_symptom %>% 
@@ -353,7 +353,7 @@ ggplot(max_intensity_df, aes(x = max_intensity, y = n)) +
 
 
 
-# Figure 5 ----------------------------------------------------------------
+# Main text Figure 3 ----------------------------------------------------------------
 
 traject_vars <-  c("malaise_intensity_reordered_imputed", "fever_intensity_reordered_imputed", 
                    "weakness_intensity_reordered_imputed", "headache_intensity_reordered_imputed",  
@@ -400,7 +400,7 @@ ipr_matrix_imputed %>%
         panel.border  = element_rect(size = 0.25),
         legend.position="none") 
 
-# Figure 6 ----------------------------------------------------------------
+# Main text Figure 4 ----------------------------------------------------------------
 #Symptom intensity correlation matrix
 intensity_matrix <- ipr_matrix_imputed %>% 
   ungroup() %>% 
@@ -516,7 +516,7 @@ binary_v_int <- map_df(int_vars, activity_change_mods, ipr_model) %>% arrange(de
 
 #Table 2 is a combination of int_v_activity and binary_v_int
 
-# Supplement 2 ------------------------------------------------------------
+# Appendix table 2 & 3 ------------------------------------------------------------
 
 # Index versus contact
 index_contact_df <- ipr_symptom %>%
